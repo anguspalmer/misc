@@ -1,4 +1,6 @@
 const path = require("path");
+const crypto = require("crypto");
+const pbkdf2 = require("pbkdf2");
 
 exports.root = path.join(__dirname, "..", "..");
 
@@ -9,8 +11,6 @@ exports.filepath = function() {
   return p;
 };
 
-const crypto = require("crypto");
-
 exports.randomId = function(n, encoding) {
   return crypto.randomBytes(n).toString(encoding);
 };
@@ -19,8 +19,6 @@ exports.hex = function(chars) {
   if (!chars) chars = 16;
   return exports.randomId(Math.ceil(chars / 2), "hex");
 };
-
-const pbkdf2 = require("pbkdf2");
 
 exports.hashPassword = function(password, salt) {
   return pbkdf2.pbkdf2Sync(password, salt, 1, 32, "sha512").toString("hex");
