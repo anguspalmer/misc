@@ -2,7 +2,7 @@ const path = require("path");
 const crypto = require("crypto");
 const pbkdf2 = require("pbkdf2");
 
-exports.root = path.join(__dirname, "..", "..");
+exports.root = require("os").tmpdir();
 
 exports.filepath = function() {
   let args = Array.prototype.slice.call(arguments);

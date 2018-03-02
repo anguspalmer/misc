@@ -1,8 +1,8 @@
 {
-  "name": "util",
+  "name": "misc",
   "version": "0.2.0",
   "private": true,
-  "main": "util.js",
+  "main": "misc.js",
   "dependencies": {
     "pbkdf2": "^3.0.14"
   }
