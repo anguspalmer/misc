@@ -24,6 +24,13 @@ exports.hashPassword = function(password, salt) {
   return pbkdf2.pbkdf2Sync(password, salt, 1, 32, "sha512").toString("hex");
 };
 
+exports.md5 = function(message) {
+  return crypto
+    .createHash("md5")
+    .update(message)
+    .digest("hex");
+};
+
 exports.newPassword = function(password) {
   let salt = exports.hex(64);
   let hash = exports.hashPassword(password, salt);
@@ -55,7 +62,7 @@ exports.bindMethods = function(instance) {
   }
 };
 
-//milliseconds duration to human readable
+//milliseconds duration to human readable (number to string)
 exports.duration = function(millis) {
   var v = millis;
   if (v < 0) return "<future>";
@@ -75,6 +82,25 @@ exports.duration = function(millis) {
     v = Math.round(v / s[1]);
   }
   return v + " " + s[0] + (s[0] === "ms" || v === 1 ? "" : "s");
+};
+
+exports.parseDuration = function(str) {
+  //duration parser
+  if (!/^(\d+)(d|h|m|s|ms)$/.test(str)) {
+    throw `invalid expiry: ${str}`;
+  }
+  let n = parseInt(RegExp.$1, 10);
+  switch (RegExp.$2) {
+    case "d":
+      n *= 24;
+    case "h":
+      n *= 60;
+    case "m":
+      n *= 60;
+    case "s":
+      n *= 1000;
+  }
+  return n;
 };
 
 exports.bytes = function(n, d) {
