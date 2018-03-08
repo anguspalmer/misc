@@ -2,11 +2,15 @@ const path = require("path");
 const crypto = require("crypto");
 const pbkdf2 = require("pbkdf2");
 
-exports.root = require("os").tmpdir();
+exports.dataDir = require("os").tmpdir();
 
-exports.filepath = function() {
+exports.setDataDir = dir => {
+  exports.dataDir = dir;
+};
+
+exports.dataPath = function() {
   let args = Array.prototype.slice.call(arguments);
-  args = [exports.root].concat(args);
+  args = [exports.dataDir].concat(args);
   let p = path.join.apply(null, args);
   return p;
 };
