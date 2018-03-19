@@ -8,11 +8,11 @@ exports.setDataDir = dir => {
   exports.dataDir = dir;
 };
 
-exports.dataPath = function() {
-  let args = Array.prototype.slice.call(arguments);
-  args = [exports.dataDir].concat(args);
-  let p = path.join.apply(null, args);
-  return p;
+exports.dataPath = function(...args) {
+  if (!exports.dataDir) {
+    throw `data dir unset`;
+  }
+  return path.join(exports.dataDir, ...args);
 };
 
 exports.randomId = function(n, encoding) {
@@ -24,15 +24,15 @@ exports.hex = function(chars) {
   return exports.randomId(Math.ceil(chars / 2), "hex");
 };
 
-exports.hashPassword = function(password, salt) {
-  return pbkdf2.pbkdf2Sync(password, salt, 1, 32, "sha512").toString("hex");
-};
-
 exports.md5 = function(message) {
   return crypto
     .createHash("md5")
     .update(message)
     .digest("hex");
+};
+
+exports.hashPassword = function(password, salt) {
+  return pbkdf2.pbkdf2Sync(password, salt, 1, 32, "sha512").toString("hex");
 };
 
 exports.newPassword = function(password) {
@@ -41,9 +41,12 @@ exports.newPassword = function(password) {
   return salt + hash;
 };
 
-exports.verifyPassword = function(attempt) {
-  let salt = this.password.slice(0, 64);
-  let hash = this.password.slice(64, 128);
+exports.verifyPassword = function(salthash, attempt) {
+  if (!salthash || salthash.length !== 128 || /[^a-f0-9]/.test(salthash)) {
+    throw `Invalid salt-hash (expected 128 hex chars)`;
+  }
+  let salt = salthash.slice(0, 64);
+  let hash = salthash.slice(64, 128);
   return hash === exports.hashPassword(attempt, salt);
 };
 
@@ -103,6 +106,8 @@ exports.parseDuration = function(str) {
       n *= 60;
     case "s":
       n *= 1000;
+    case "ms":
+    //noop
   }
   return n;
 };
