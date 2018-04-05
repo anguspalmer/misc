@@ -94,7 +94,7 @@ exports.duration = function(millis) {
 exports.parseDuration = function(str) {
   //duration parser
   if (!/^(\d+)(d|h|m|s|ms)$/.test(str)) {
-    throw `invalid expiry: ${str}`;
+    throw `invalid duration "${str}"`;
   }
   let n = parseInt(RegExp.$1, 10);
   switch (RegExp.$2) {
