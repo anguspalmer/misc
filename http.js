@@ -27,10 +27,18 @@ exports.wrap = handler => {
       if (res.headersSent) {
         return;
       }
-      if (!data) {
+      if (data === undefined) {
         return;
       }
-      res.status(200).send(data);
+      res.status(200);
+      let out;
+      if (typeof data === "string") {
+        out = data;
+      } else {
+        res.set("Content-Type", "application/json");
+        out = JSON.stringify(data, null, 2);
+      }
+      res.send(out);
     } catch (err) {
       if (res.headersSent) {
         return;
