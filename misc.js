@@ -51,11 +51,11 @@ exports.verifyPassword = function(salthash, attempt) {
 };
 
 exports.btoa = function(ascii) {
-  return new Buffer(ascii).toString("base64");
+  return Buffer.from(ascii).toString("base64");
 };
 
 exports.atob = function(b64) {
-  return new Buffer(b64, "base64").toString("ascii");
+  return Buffer.from(b64, "base64").toString("ascii");
 };
 
 exports.bindMethods = function(instance) {
@@ -121,7 +121,7 @@ exports.bytes = function(n, d) {
   // set rounding factor
   var f = Math.pow(10, d);
   // scale n down and round
-  var s = Math.round(n / Math.pow(10, i * 3) * f) / f;
+  var s = Math.round((n / Math.pow(10, i * 3)) * f) / f;
   // concat (no trailing 0s) and choose scale letter
   return (
     s.toString().replace(/\.0+$/, "") +
