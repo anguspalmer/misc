@@ -1,20 +1,27 @@
 const { dataPath } = require("misc");
 
 let configs = null;
-try {
-  configs = require(dataPath("config.json"));
-} catch (err) {
-  console.log("invalid config.json: " + err);
-  process.exit(1);
-}
+
+const init = () => {
+  if (configs !== null) {
+    try {
+      configs = require(exports.dataPath("config.json"));
+    } catch (err) {
+      console.log("invalid config.json: " + err);
+      process.exit(1);
+    }
+  }
+};
 
 //check if config has key
 const has = key => {
+  init();
   return key in configs;
 };
 
 //get config key
 const get = (key, def) => {
+  init();
   let value = configs[key];
   if (!has(key)) {
     if (def === undefined) {
@@ -25,7 +32,8 @@ const get = (key, def) => {
   return value;
 };
 
-let api = get;
-api.get = get;
-api.has = has;
-module.exports = api;
+var exports = get;
+exports.dataPath = dataPath;
+exports.has = has;
+exports.get = get;
+module.exports = exports;
