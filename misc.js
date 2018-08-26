@@ -140,3 +140,25 @@ exports.shuffle = function(a) {
     a[j] = x;
   }
 };
+
+//fancy csv library
+exports.csv = {
+  decode(str) {
+    return str
+      .split("\n")
+      .filter(c => c && !c.startsWith("#"))
+      .map(c => c.split(","));
+  },
+  encode(rows) {
+    return rows
+      .map(cols =>
+        cols
+          .map(
+            c =>
+              c === null || c === undefined ? "" : /,/.test(c) ? `"${c}"` : c
+          )
+          .join(",")
+      )
+      .join("\n");
+  }
+};
