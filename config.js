@@ -3,9 +3,11 @@ const { dataPath } = require("misc");
 let configs = null;
 
 const init = () => {
-  if (configs !== null) {
+  if (configs === null) {
+    const filepath = exports.dataPath("config.json");
+    console.log(filepath);
     try {
-      configs = require(exports.dataPath("config.json"));
+      configs = require(filepath);
     } catch (err) {
       console.log("invalid config.json: " + err);
       process.exit(1);
