@@ -146,8 +146,8 @@ exports.csv = {
   decode(str) {
     return str
       .split("\n")
-      .filter(c => c && !c.startsWith("#"))
-      .map(c => c.split(","));
+      .filter(r => r && !r.startsWith("#"))
+      .map(r => r.split(",").map(c => (/^"(.*)"$/.test(c) ? RegExp.$1 : c)));
   },
   encode(rows) {
     return rows

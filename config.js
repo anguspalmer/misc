@@ -43,6 +43,12 @@ const template = (src, spec) => {
     throw `expected spec object`;
   }
   const dst = {};
+  for (let k in src) {
+    //copy extra fields over directly
+    if (!(k in spec)) {
+      dst[k] = src[k];
+    }
+  }
   for (let k in spec) {
     let val = src[k];
     const vtype = typeof val;
@@ -71,6 +77,7 @@ const template = (src, spec) => {
       dst[k] = val;
     }
   }
+
   return dst;
 };
 
