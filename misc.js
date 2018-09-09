@@ -4,6 +4,8 @@ const pbkdf2 = require("pbkdf2");
 
 exports.dataDir = require("os").tmpdir();
 
+//TODO: @jpillora: this creates a package global.
+//THIS BREAKS IF TWO VERSIONS OF 'misc' ARE USED.
 exports.setDataDir = dir => {
   exports.dataDir = dir;
 };
@@ -93,7 +95,7 @@ exports.duration = function(millis) {
 
 exports.parseDuration = function(str) {
   //duration parser
-  if (!/^(\d+)(d|h|m|s|ms)$/.test(str)) {
+  if (!/^(\d+)\s*(d|h|m|s|ms)$/.test(str)) {
     throw `invalid duration "${str}"`;
   }
   let n = parseInt(RegExp.$1, 10);
