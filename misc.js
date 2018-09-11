@@ -144,23 +144,61 @@ exports.shuffle = function(a) {
 };
 
 //fancy csv library
-exports.csv = {
-  decode(str) {
-    return str
+const csv = {};
+{
+  //decode functions
+  csv.decode = (str, opts = {}) => {
+    let rows = (str ? str.toString() : "")
       .split("\n")
       .filter(r => r && !r.startsWith("#"))
-      .map(r => r.split(",").map(c => (/^"(.*)"$/.test(c) ? RegExp.$1 : c)));
-  },
-  encode(rows) {
-    return rows
-      .map(cols =>
-        cols
-          .map(
-            c =>
-              c === null || c === undefined ? "" : /,/.test(c) ? `"${c}"` : c
-          )
-          .join(",")
-      )
-      .join("\n");
-  }
-};
+      .map(csv.decode.row);
+    //use the header row to map rows into objects
+    if (opts.header) {
+      const header = rows.shift();
+      rows = rows.map(row => {
+        const o = {};
+        for (let i = 0; i < row.length; i++) {
+          o[header[i]] = row[i];
+        }
+        return o;
+      });
+    }
+    //result
+    return rows;
+  };
+  csv.decode.row = r => r.split(",").map(csv.decode.col);
+  csv.decode.col = c => (/^"(.*)"$/.test(c) ? RegExp.$1 : c);
+  //encode functions
+  csv.encode = (rows, opts = {}) => {
+    //compute headers from all data
+    if (opts.header) {
+      //one pass to get all headers
+      let header = new Set();
+      for (const row of rows) {
+        if (!row || Array.isArray(row)) {
+          throw `Expected row object`;
+        }
+        for (const key in row) {
+          header.add(key);
+        }
+      }
+      header = Array.from(header);
+      //next pass to write out columns
+      rows = [header].concat(
+        rows.map(row => {
+          const cols = [];
+          for (let i = 0; i < header.length; i++) {
+            cols[i] = row[header[i]];
+          }
+          return cols;
+        })
+      );
+    }
+    //write out csv rows
+    return rows.map(csv.encode.row).join("\n");
+  };
+  csv.encode.row = row => row.map(csv.encode.col).join(",");
+  csv.encode.col = c =>
+    c === null || c === undefined ? "" : /,/.test(c) ? `"${c}"` : c;
+}
+exports.csv = csv;
