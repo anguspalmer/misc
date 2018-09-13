@@ -173,16 +173,23 @@ const csv = {};
     //compute headers from all data
     if (opts.header) {
       //one pass to get all headers
-      let header = new Set();
+      const headerSet = new Set();
+      //predefined headers, in order
+      if (Array.isArray(opts.header)) {
+        for (const key of opts.header) {
+          headerSet.add(key);
+        }
+      }
+      //check all rows and all columns for headers
       for (const row of rows) {
         if (!row || Array.isArray(row)) {
           throw `Expected row object`;
         }
         for (const key in row) {
-          header.add(key);
+          headerSet.add(key);
         }
       }
-      header = Array.from(header);
+      const header = Array.from(headerSet);
       //next pass to write out columns
       rows = [header].concat(
         rows.map(row => {
