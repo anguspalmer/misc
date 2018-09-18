@@ -174,12 +174,6 @@ const csv = {};
     if (opts.header) {
       //one pass to get all headers
       const headerSet = new Set();
-      //predefined headers, in order
-      if (Array.isArray(opts.header)) {
-        for (const key of opts.header) {
-          headerSet.add(key);
-        }
-      }
       //check all rows and all columns for headers
       for (const row of rows) {
         if (!row || Array.isArray(row)) {
@@ -190,6 +184,22 @@ const csv = {};
         }
       }
       const header = Array.from(headerSet);
+      //predefined header order, inplace sort
+      if (Array.isArray(opts.header)) {
+        const order = opts.header.filter(h => headerSet.has(h));
+        for (let i = 0; i < order.length; i++) {
+          const target = order[i];
+          const j = header.indexOf(target);
+          if (j === i || j === -1) {
+            //matches/missing, skip
+            continue;
+          }
+          //exists, in wrong order, swap
+          const current = header[i];
+          header[i] = target;
+          header[j] = current;
+        }
+      }
       //next pass to write out columns
       rows = [header].concat(
         rows.map(row => {
