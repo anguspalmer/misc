@@ -71,10 +71,16 @@ exports.wrap = handler => {
         }
         res.status(500).send("server error");
       } else {
+        //throw string
+        let msg = err.message || err.toString();
+        let status = err.status;
+        if (!status && /not found/i.test(msg)) {
+          status = 404;
+        } else {
+          status = 400;
+        }
         //all other errors
-        res
-          .status(err.status || 400)
-          .send({ error: err.message || err.toString() });
+        res.status(status).send({ error: msg });
       }
     }
   };
