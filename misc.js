@@ -2,21 +2,6 @@ const path = require("path");
 const crypto = require("crypto");
 const pbkdf2 = require("pbkdf2");
 
-exports.dataDir = require("os").tmpdir();
-
-//TODO: @jpillora: this creates a package global.
-//THIS BREAKS IF TWO VERSIONS OF 'misc' ARE USED.
-exports.setDataDir = dir => {
-  exports.dataDir = dir;
-};
-
-exports.dataPath = function(...args) {
-  if (!exports.dataDir) {
-    throw `data dir unset`;
-  }
-  return path.join(exports.dataDir, ...args);
-};
-
 exports.randomId = function(n, encoding) {
   return crypto.randomBytes(n).toString(encoding);
 };
