@@ -58,7 +58,7 @@ class ConfigMap {
           val = this.get(field.key);
         }
       } else if (ftype === "array" && Array.isArray(val) && field.element) {
-        val = val.map(v => template(v, field.element));
+        val = val.map(v => this.template(v, field.element));
       } else if (vtype === "undefined") {
         if (field.required) {
           throw `field "${k}" is required`;
