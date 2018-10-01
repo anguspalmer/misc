@@ -21,13 +21,22 @@ exports.wrap = handler => {
   if (typeof handler !== "function") {
     throw new Error(`http wrap expected function`);
   }
-  return async (req, res) => {
+  const len = handler.length;
+  //convert return value OR thrown value to HTTP responses
+  const converter = async (req, res, next) => {
+    //record if next was called
+    let nexted = false;
+    if (next) {
+      const orig = next;
+      next = () => {
+        nexted = true;
+        return orig();
+      };
+    }
+    //run handler!
     try {
-      let data = await handler.call(null, req, res);
-      if (res.headersSent) {
-        return;
-      }
-      if (data === undefined) {
+      let data = await handler.call(null, req, res, next);
+      if (res.headersSent || data === undefined || nexted) {
         return;
       }
       res.status(200);
@@ -40,7 +49,7 @@ exports.wrap = handler => {
       }
       res.send(out);
     } catch (err) {
-      if (res.headersSent) {
+      if (res.headersSent || nexted) {
         return;
       }
       //show failed SQL errors
@@ -74,14 +83,25 @@ exports.wrap = handler => {
         //throw string
         let msg = err.message || err.toString();
         let status = err.status;
-        if (!status && /not found/i.test(msg)) {
-          status = 404;
-        } else {
-          status = 400;
+        if (!status) {
+          if (/not found/i.test(msg)) {
+            status = 404;
+          } else if (/auth/i.test(msg)) {
+            status = 401;
+          } else {
+            status = 400;
+          }
         }
         //all other errors
         res.status(status).send({ error: msg });
       }
     }
   };
+  //express checks the number of args to determine the type of handler.
+  //so, our wrapper must match the arity of our handler.
+  const args = new Array(len).fill().map((_, i) => `arg${i}`);
+  const body = `return this.converter.apply(null, arguments);`;
+  const wrapper = new Function(args, body).bind({ converter });
+  //DEBUG console.log(`[misc/http] wrapped "${handler.name}" (#${len})`);
+  return wrapper;
 };
