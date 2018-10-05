@@ -22,14 +22,15 @@ exports.decode.row = r => r.split(",").map(exports.decode.col);
 exports.decode.col = c => (/^"(.*)"$/.test(c) ? RegExp.$1 : c);
 
 //special streaming decode
-exports.decode.stream = async function*(filepath) {
-  //async generator function:
-  //a promise, wrapped around a function which
-  //yields objects (decoded csv rows),
-  //the promise rejects if any error is encountered,
-  //and resolves once the entire file has been read.
-  throw "TODO";
-};
+//NOTE REQUIRES NODE 10+
+// exports.decode.stream = async function*(filepath) {
+//async generator function:
+//a promise, wrapped around a function which
+//yields objects (decoded csv rows),
+//the promise rejects if any error is encountered,
+//and resolves once the entire file has been read.
+//   throw "TODO";
+// };
 
 //encode functions
 exports.encode = (rows, opts = {}) => {
