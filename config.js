@@ -1,4 +1,4 @@
-const { bindMethods } = require("misc");
+const { bindMethods } = require("./misc");
 
 exports.load = filepath => new ConfigMap(filepath);
 
