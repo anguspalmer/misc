@@ -9,6 +9,9 @@ exports.decode = (str, opts = {}) => {
     const header = rows.shift();
     rows = rows.map(row => {
       const o = {};
+      if (row.length !== header.length) {
+        throw `row has ${row.length}, expected ${header.length}: ${row}`;
+      }
       for (let i = 0; i < row.length; i++) {
         o[header[i]] = row[i];
       }
@@ -18,17 +21,35 @@ exports.decode = (str, opts = {}) => {
   //result
   return rows;
 };
-exports.decode.row = r => r.split(",").map(exports.decode.col);
-exports.decode.col = c => (/^"(.*)"$/.test(c) ? RegExp.$1 : c);
+exports.decode.row = r => {
+  let col = "";
+  let quoted = false;
+  const cols = [];
+  for (let c of r) {
+    if (c === '"') {
+      quoted = !quoted;
+      continue;
+    } else if (c === "," && !quoted) {
+      cols.push(col);
+      col = "";
+      continue;
+    }
+    col += c;
+  }
+  if (col) {
+    cols.push(col);
+  }
+  return cols;
+};
 
 //special streaming decode
 //NOTE REQUIRES NODE 10+
-// exports.decode.stream = async function*(filepath) {
 //async generator function:
 //a promise, wrapped around a function which
 //yields objects (decoded csv rows),
 //the promise rejects if any error is encountered,
 //and resolves once the entire file has been read.
+// exports.decode.stream = async function*(filepath) {
 //   throw "TODO";
 // };
 
