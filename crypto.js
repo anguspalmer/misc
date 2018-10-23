@@ -35,3 +35,32 @@ exports.verifyPassword = function(salthash, attempt) {
   let hash = salthash.slice(64, 128);
   return hash === exports.hashPassword(attempt, salt);
 };
+
+//hash object, ignoring key order
+exports.hashObject = function(object) {
+  return exports.md5(
+    JSON.stringify(object, (_, v) => {
+      if (v && typeof v === "object") {
+        const o = {};
+        const ks = Object.keys(v).sort();
+        for (const k of ks) {
+          o[k] = v[k];
+        }
+        return o;
+      }
+      return v;
+    })
+  );
+};
+
+//hash row (flat object), specifying keys
+exports.rowHasher = function(keys) {
+  return function(row) {
+    const h = crypto.createHash("md5");
+    const ks = keys || Object.keys(row).sort();
+    for (const key of ks) {
+      h.update(`${key}=${row[key]}`);
+    }
+    return h.digest("hex");
+  };
+};
