@@ -10,7 +10,8 @@ exports.decode = (str, opts = {}) => {
     rows = rows.map(row => {
       const o = {};
       if (row.length !== header.length) {
-        throw `row has ${row.length}, expected ${header.length}: ${row}`;
+        throw `row has #${row.length}, expected #${header.length}:` +
+          ` row "${row.join(",")}"`;
       }
       for (let i = 0; i < row.length; i++) {
         o[header[i]] = row[i];
@@ -25,18 +26,21 @@ exports.decode.row = r => {
   let col = "";
   let quoted = false;
   const cols = [];
+  let commas = 0;
   for (let c of r) {
     if (c === '"') {
       quoted = !quoted;
       continue;
     } else if (c === "," && !quoted) {
+      commas++;
       cols.push(col);
       col = "";
       continue;
     }
     col += c;
   }
-  if (col) {
+  //there should be commas+1 columns
+  if (commas === cols.length) {
     cols.push(col);
   }
   return cols;
