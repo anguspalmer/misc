@@ -3,7 +3,6 @@
   "version": "0.2.0",
   "private": true,
   "main": "misc.js",
-  "NOTE": "SHOULD HAVE NO AC3 DEPENDENCIES",
   "dependencies": {
     "pbkdf2": "^3.0.14"
   }
